@@ -594,6 +594,16 @@ func (b *BPFMap) DeleteKey(key unsafe.Pointer) error {
 	return nil
 }
 
+// DeleteBatch deletes a batch of maps of keys.
+// bpf_map_delete_batch
+func (b *BPFMap) DeleteBatch(keys unsafe.Pointer, tcOpts *TcOpts) error {
+	errC := C.bpf_map_delete_batch(b.bpfMap, keys, C.size_t(b.mapType.keySize), C.size_t(b.mapType.valueSize), tcOptsToC(tcOpts))
+	if errC != 0 {
+		return fmt.Errorf("failed to delete batch of map %s", b.name)
+	}
+	return nil
+}
+
 // Update takes a pointer to a key and a value to associate it with in
 // the BPFMap. The unsafe.Pointer should be taken on a reference to the
 // underlying datatype. All basic types, and structs are supported
